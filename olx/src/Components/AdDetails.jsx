@@ -4,61 +4,52 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/setup';
 import { toast } from 'react-toastify';
 import { formatDistanceToNow } from 'date-fns';
-import { useAuth } from '../Context/AuthContext';
 import Navbar from '../Components/Navbar';
 import Footer from '../Components/Footer';
 
 function AdDetails() {
   const { id } = useParams();
-  const { getUserInfo } = useAuth();
   const [listing, setListing] = useState(null);
-  const [seller, setSeller] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // fetch listing and seller details
+  
   useEffect(() => {
-    const fetchListingAndSeller = async () => {
+    const fetchListing = async () => {
       try {
         const listingDoc = await getDoc(doc(db, 'listings', id));
+        console.log("details:", listingDoc.data())
         if (listingDoc.exists()) {
-          const listingData = { id: listingDoc.id, ...listingDoc.data() };
-          setListing(listingData);
-          if (listingData.userId) {
-            const sellerInfo = await getUserInfo(listingData.userId);
-            if (sellerInfo) {
-              setSeller(sellerInfo);
-            } else {
-              toast.error('seller info not found');
-            }
-          } else {
-            toast.error('no seller for this listing');
-          }
+          setListing({ id: listingDoc.id, ...listingDoc.data() });
         } else {
-          toast.error('listing not found');
+          toast.error('Listing not found.');
         }
       } catch (error) {
-        console.error('error fetching listing/seller:', error);
-        toast.error('failed to load details');
+        console.error('Error fetching listing:', error);
+        toast.error('Failed to load listing details.');
       }
     };
-    fetchListingAndSeller();
-  }, [id, getUserInfo]);
+    fetchListing();
+  }, [id]);
 
-  // image carousel controls
-  const nextImage = () =>
-    listing?.photos?.length > 0 &&
-    setCurrentImageIndex((prev) => (prev + 1) % listing.photos.length);
+  // Image carousel controls
+  const nextImage = () => {
+    if (listing?.photos?.length > 0) {
+      setCurrentImageIndex((prev) => (prev + 1) % listing.photos.length);
+    }
+  };
 
-  const prevImage = () =>
-    listing?.photos?.length > 0 &&
-    setCurrentImageIndex((prev) => (prev - 1 + listing.photos.length) % listing.photos.length);
+  const prevImage = () => {
+    if (listing?.photos?.length > 0) {
+      setCurrentImageIndex((prev) => (prev - 1 + listing.photos.length) % listing.photos.length);
+    }
+  };
 
   if (!listing) {
     return (
       <div className="flex flex-col min-h-screen">
         <Navbar />
         <main className="flex-grow flex items-center justify-center">
-          <p className="text-lg">loading...</p>
+          <p className="text-lg">Loading...</p>
         </main>
         <Footer />
       </div>
@@ -70,7 +61,7 @@ function AdDetails() {
       <Navbar />
       <main className="flex-grow max-w-7xl mx-auto p-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* image carousel */}
+          {/* Image Carousel */}
           <div className="relative">
             {listing.photos?.length > 0 ? (
               <>
@@ -85,13 +76,13 @@ function AdDetails() {
                       onClick={prevImage}
                       className="bg-gray-800 text-white p-3 rounded-full hover:bg-gray-700"
                     >
-                      ←
+                      &larr;
                     </button>
                     <button
                       onClick={nextImage}
                       className="bg-gray-800 text-white p-3 rounded-full hover:bg-gray-700"
                     >
-                      →
+                      &rarr;
                     </button>
                   </div>
                 )}
@@ -100,7 +91,7 @@ function AdDetails() {
                     <img
                       key={index}
                       src={photo}
-                      alt={`thumbnail ${index + 1}`}
+                      alt={`Thumbnail ${index + 1}`}
                       className={`w-16 h-16 object-cover rounded cursor-pointer ${
                         index === currentImageIndex ? 'border-2 border-blue-500' : ''
                       }`}
@@ -111,63 +102,43 @@ function AdDetails() {
               </>
             ) : (
               <div className="w-full h-96 bg-gray-200 flex items-center justify-center rounded-lg">
-                <span className="text-gray-500">no images available</span>
+                <span className="text-gray-500">No images available</span>
               </div>
             )}
           </div>
 
-          {/* product details */}
+          {/* Product Details */}
           <div className="space-y-4">
-            <h1 className="text-3xl font-bold text-gray-800">{listing.title || 'untitled'}</h1>
-            <p className="text-2xl font-semibold text-green-600">₹{listing.price?.toFixed(2) || 'n/a'}</p>
+            <h1 className="text-3xl font-bold text-gray-800">{listing.title || 'Untitled'}</h1>
+            <p className="text-2xl font-semibold text-green-600">₹{listing.price?.toFixed(2) || 'N/A'}</p>
             <p className="text-sm text-gray-500">
-              posted{' '}
-              {listing.createdAt?.toDate
-                ? formatDistanceToNow(listing.createdAt.toDate(), { addSuffix: true })
-                : 'unknown'}
+              Posted {listing.createdAt?.toDate ? formatDistanceToNow(listing.createdAt.toDate(), { addSuffix: true }) : 'Unknown'}
             </p>
             <div className="border-t border-b py-4 space-y-2 bg-gray-50 p-4 rounded-lg">
-              <p>
-                <span className="font-semibold">category:</span> {listing.category || 'uncategorized'}
-              </p>
-              <p>
-                <span className="font-semibold">brand:</span> {listing.brand || 'n/a'}
-              </p>
-              <p>
-                <span className="font-semibold">condition:</span> {listing.condition || 'n/a'}
-              </p>
-              <p>
-                <span className="font-semibold">location:</span>{' '}
-                {listing.location && listing.state ? `${listing.location}, ${listing.state}` : 'unknown'}
-              </p>
+              <p><span className="font-semibold">Category:</span> {listing.category || 'Uncategorized'}</p>
+              <p><span className="font-semibold">Brand:</span> {listing.brand || 'N/A'}</p>
+              <p><span className="font-semibold">Condition:</span> {listing.condition || 'N/A'}</p>
+              <p><span className="font-semibold">Location:</span> {listing.location && listing.state ? `${listing.location}, ${listing.state}` : 'Unknown'}</p>
             </div>
             <div>
-              <h2 className="text-xl font-semibold">description</h2>
-              <p className="text-gray-700 whitespace-pre-wrap">
-                {listing.description || 'no description provided'}
-              </p>
+              <h2 className="text-xl font-semibold">Description</h2>
+              <p className="text-gray-700 whitespace-pre-wrap">{listing.description || 'No description provided.'}</p>
             </div>
           </div>
         </div>
 
-        {/* seller information */}
+        {/* Seller Information */}
         <div className="mt-8 border-t pt-6">
-          <h2 className="text-xl font-semibold">seller information</h2>
+          <h2 className="text-xl font-semibold">Seller Information</h2>
           <div className="mt-4 space-y-2">
-            <p>
-              <span className="font-semibold">name:</span> {seller?.username || listing?.name || 'n/a'}
-            </p>
-            <p>
-              <span className="font-semibold">email:</span> {seller?.email || 'n/a'}
-            </p>
-            <p>
-              <span className="font-semibold">contact:</span> please contact via platform messaging
-            </p>
+            <p><span className="font-semibold">SellerName:</span> {listing?.sellername}</p>
+            <p><span className="font-semibold">PhoneNumber:</span> {listing?.phonenumber}</p>
+            <p><span className="font-semibold">Contact:</span> Please contact via platform messaging</p>
             <button
               className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-              onClick={() => toast.info('please use the platform to message the seller')}
+              onClick={() => toast.info('Please use the platform to message the seller.')}
             >
-              contact seller
+              Contact Seller
             </button>
           </div>
         </div>
