@@ -21,15 +21,15 @@ function Login({ setLoginPop }) {
       if (isRegister) {
         await register(email, password, username);
         toast.success('User registered successfully!', {
-                  position: 'top-right',
-                  autoClose: 2000,
-                });
+          position: 'top-right',
+          autoClose: 2000,
+        });
       } else {
+        await login(email, password);
         toast.success('User Loged-in successfully!', {
           position: 'top-right',
           autoClose: 2000,
         });
-        await login(email, password);
       }
       setLoginPop(false);
     } catch (err) {
@@ -40,6 +40,11 @@ function Login({ setLoginPop }) {
   const handleEmailLoginClick = () => {
     setShowEmailLogin(true);
     setIsRegister(false);
+  };
+
+  const handleRegisterClick = () => {
+    setShowEmailLogin(true);
+    setIsRegister(true);
   };
 
   return (
@@ -69,12 +74,28 @@ function Login({ setLoginPop }) {
                           <h1 className="font-semibold ml-10">Continue with Google</h1>
                         </div>
                         <h1 className="text-center mt-4">OR</h1>
-                        <h1
-                          className="text-center font-semibold underline cursor-pointer mt-4"
-                          onClick={handleEmailLoginClick}
-                        >
-                          Login with email
-                        </h1>
+                        <div className="flex flex-col items-center mt-6 space-y-3">
+                          <div className="flex items-center space-x-2">
+                            <span className="text-sm text-gray-800">Already have an account?</span>
+                            <button
+                              type="button"
+                              className="text-sm font-medium text-blue-800 underline hover:text-blue-900 focus:outline-none"
+                              onClick={handleEmailLoginClick}
+                            >
+                              Login with email
+                            </button>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-sm text-gray-800">Need an account?</span>
+                            <button
+                              type="button"
+                              className="text-sm font-medium text-blue-800 underline hover:text-blue-900 focus:outline-none"
+                              onClick={handleRegisterClick}
+                            >
+                              Register
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     ) : (
                       <div className="mt-12">
@@ -147,17 +168,17 @@ function Login({ setLoginPop }) {
                             </button>
                           </form>
                         )}
+                        <p className="mt-4 text-center">
+                          {isRegister ? 'Already have an account?' : 'Need an account?'}
+                          <button
+                            onClick={() => setIsRegister(!isRegister)}
+                            className="text-blue-500 underline ml-1"
+                          >
+                            {isRegister ? 'Login' : 'Register'}
+                          </button>
+                        </p>
                       </div>
                     )}
-                    <p className="mt-4 text-center">
-                      {isRegister ? 'Already have an account?' : 'Need an account?'}
-                      <button
-                        onClick={() => setIsRegister(!isRegister)}
-                        className="text-blue-500 underline ml-1"
-                      >
-                        {isRegister ? 'Login' : 'Register'}
-                      </button>
-                    </p>
                     <h1 className="text-center text-sm mt-4">
                       All your personal details are safe with us.
                     </h1>

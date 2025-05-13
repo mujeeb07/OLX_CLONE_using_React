@@ -8,11 +8,17 @@ import sell_button from '../assets/sellButton.png';
 import Login from './Login';
 import SellForm from './SellForm';
 import { toast } from 'react-toastify';
+import { Navigate, useNavigate } from 'react-router-dom';
+import avatar from '../assets/avatar.png';
+import UserProfile from './UserProfile';
+
 
 function Navbar() {
   const [loginPop, setLoginPop] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [profile, setProfile] = useState(false);
   const { user, logout } = useAuth();
+  const navigate = useNavigate()
 
   const handleAuthClick = async () => {
     if (user) {
@@ -44,10 +50,17 @@ function Navbar() {
       setLoginPop(true); 
     }
   };
+  const handleNavigateHome = () => {
+    navigate('/')
+  }
+
+  const handleProfile = () => {
+    setProfile(!profile);
+  }
 
   return (
     <>
-      <div className="flex p-4 bg-slate-100 shadow-md items-center justify-between">
+      <div className="flex p-4 bg-slate-100 shadow-md items-center justify-between cursor-pointer" onClick={handleNavigateHome}>
         <img src={olx_logo_blue} alt="logo" className="w-15 h-12" />
         <div className="flex border-2 h-12 w-72 p-2 border-black ml-5 items-center">
           <img src={search1} className="w-6 h-5" alt="search location" />
@@ -81,6 +94,15 @@ function Navbar() {
           <h1 className="font-bold text-lg underline hover:no-underline">
             {user ? 'Logout' : 'Login'}
           </h1>
+        </div>
+
+        <div className="relative flex items-center cursor-pointer ml-5" onClick={handleProfile}>
+          <img src={avatar} alt="User avatar" className="w-8 h-8 rounded-full" />
+          {profile && (
+            <div className="absolute top-full right-0 z-50">
+              <UserProfile isOpen={profile} onClose={() => setProfile(false)} />
+            </div>
+          )}
         </div>
 
         <div

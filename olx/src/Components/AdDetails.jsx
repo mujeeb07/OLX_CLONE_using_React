@@ -74,15 +74,15 @@ function AdDetails() {
                   <div className="absolute top-1/2 w-full flex justify-between px-4 transform -translate-y-1/2">
                     <button
                       onClick={prevImage}
-                      className="bg-gray-800 text-white p-3 rounded-full hover:bg-gray-700"
+                      className="bg-gray-800-10 text-white  rounded-full h-12 w-12 "
                     >
-                      &larr;
+                      {'<'}
                     </button>
                     <button
                       onClick={nextImage}
-                      className="bg-gray-800 text-white p-3 rounded-full hover:bg-gray-700"
+                      className="bg-gray-800-10 text-white  rounded-full h-12 w-12 "
                     >
-                      &rarr;
+                      {'>'}
                     </button>
                   </div>
                 )}
@@ -133,7 +133,6 @@ function AdDetails() {
           <div className="mt-4 space-y-2">
             <p><span className="font-semibold">SellerName:</span> {listing?.sellername}</p>
             <p><span className="font-semibold">PhoneNumber:</span> {listing?.phonenumber}</p>
-            <p><span className="font-semibold">Contact:</span> Please contact via platform messaging</p>
             <button
               className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
               onClick={() => toast.info('Please use the platform to message the seller.')}
