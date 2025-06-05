@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../Context/AuthContext';
 import olx_logo_blue from '../assets/olx_logo_blue.svg';
 import search1 from '../assets/search1.svg';
@@ -17,9 +17,12 @@ function Navbar() {
   const [loginPop, setLoginPop] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [profile, setProfile] = useState(false);
+  const inputRef = useRef(null);
   const { user, logout } = useAuth();
   const navigate = useNavigate()
-
+  useEffect(() => {
+    inputRef.current?.focus()
+  }, [])
   const handleAuthClick = async () => {
     if (user) {
       try {
@@ -73,9 +76,9 @@ function Navbar() {
         </div>
 
         <div className="flex h-12 ml-4 border-2 border-black">
-          <input
+          <input ref={inputRef}
             placeholder="Search Cars, Mobile phones and more"
-            className="ml-3 w-96 outline-none"
+            className="ml-3 w-96 outline-none" 
           />
           <div className="flex items-center justify-center w-12 h-full bg-black">
             <img src={search2} alt="search icon" className="h-full" />

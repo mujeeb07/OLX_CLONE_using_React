@@ -5,7 +5,7 @@ import axios from 'axios';
 const CloudinaryUpload = () => {
     const [imageUrl, setImageUrl] = useState("");
 
-    const handleUplaod = async (e) => {
+    const handleUpload = async (e) => {
         const file = e.target.files[0];
         if(!file) return;
 

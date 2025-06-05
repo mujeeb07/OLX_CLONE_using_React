@@ -4,38 +4,56 @@ import { toast } from 'react-toastify';
 import guitar from '../assets/guitar.png';
 import google from '../assets/google.png';
 import phone from '../assets/phone.png';
+import { useFormik }  from 'formik';
+import * as Yup from 'yup';
+
 
 function Login({ setLoginPop }) {
   const [isRegister, setIsRegister] = useState(false);
   const [showEmailLogin, setShowEmailLogin] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
   const [error, setError] = useState('');
   const { login, register } = useAuth();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    try {
-      if (isRegister) {
-        await register(email, password, username);
-        toast.success('User registered successfully!', {
-          position: 'top-right',
-          autoClose: 2000,
-        });
-      } else {
-        await login(email, password);
-        toast.success('User Loged-in successfully!', {
-          position: 'top-right',
-          autoClose: 2000,
-        });
+  const loginFormik = useFormik({
+    initialValues : {
+      email:"",
+      password:""
+    },
+    validationSchema: Yup.object({
+      email:Yup.string().email("Invalid Email").required("Required"),
+      password:Yup.string().min(6, "At least 6 characters.").required("Required"),
+    }),
+    onSubmit: async (values) => {
+      try {
+        await login(values.email, values.password);
+        toast.success('User logged in successfully!', { position: 'top-right', autoClose: 2000 });
+        setLoginPop(false);
+      } catch (err) {
+        setError(err.message);
       }
-      setLoginPop(false);
-    } catch (err) {
-      setError(err.message);
+    }    
+  });
+  const registerFormik = useFormik({
+    initialValues : {
+      username:"",
+      email:"",
+      password:""
+    },
+    validationSchema: Yup.object({
+      username: Yup.string().required("Username is required."),
+      email: Yup.string().email("Enter a valid email").required("Required"),
+      password: Yup.string().min(6, "At least 6 characters").required("Required"),
+    }),
+    onSubmit: async (values) => {
+      try {
+        await register(values.email, values.password, values.username);
+        toast.success('User registered successfully!', { position: 'top-right', autoClose: 2000 });
+        setLoginPop(false);
+      } catch (err) {
+        setError(err.message);
+      }
     }
-  };
+  })
 
   const handleEmailLoginClick = () => {
     setShowEmailLogin(true);
@@ -50,7 +68,6 @@ function Login({ setLoginPop }) {
   return (
     <div className="relative z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true">
       <div className="fixed inset-0 bg-zinc-900/75 transition-opacity" aria-hidden="true"></div>
-
       <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
         <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
           <div className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:w-96 sm:max-w-lg">
@@ -100,65 +117,83 @@ function Login({ setLoginPop }) {
                     ) : (
                       <div className="mt-12">
                         {!isRegister ? (
-                          <form onSubmit={handleSubmit} className="mt-4">
-                            <div className="mb-4">
-                              <label className="block text-gray-700">Email</label>
-                              <input
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="w-full p-2 border rounded"
-                                required
-                              />
-                            </div>
-                            <div className="mb-4">
-                              <label className="block text-gray-700">Password</label>
-                              <input
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-full p-2 border rounded"
-                                required
-                              />
-                            </div>
-                            <button
-                              type="submit"
-                              className="w-full bg-blue-500 text-white p-2 rounded"
-                            >
-                              Login
-                            </button>
-                          </form>
+                          <form onSubmit={loginFormik.handleSubmit} className="mt-4">
+                          <div className="mb-4">
+                            <label className="block text-gray-700">Email</label>
+                            <input
+                              type="email"
+                              name="email"
+                              value={loginFormik.values.email}
+                              onChange={loginFormik.handleChange}
+                              onBlur={loginFormik.handleBlur}
+                              className="w-full p-2 border rounded"
+                            />
+                            {loginFormik.touched.email && loginFormik.errors.email && (
+                              <p className="text-red-500 text-sm">{loginFormik.errors.email}</p>
+                            )}
+                          </div>
+                          <div className="mb-4">
+                            <label className="block text-gray-700">Password</label>
+                            <input
+                              type="password"
+                              name="password"
+                              value={loginFormik.values.password}
+                              onChange={loginFormik.handleChange}
+                              onBlur={loginFormik.handleBlur}
+                              className="w-full p-2 border rounded"
+                            />
+                            {loginFormik.touched.password && loginFormik.errors.password && (
+                              <p className="text-red-500 text-sm">{loginFormik.errors.password}</p>
+                            )}
+                          </div>
+                          <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">
+                            Login
+                          </button>
+                        </form>
+                        
                         ) : (
-                          <form onSubmit={handleSubmit} className="mt-4">
+                          <form onSubmit={registerFormik.handleSubmit} className="mt-4">
                             <div className="mb-4">
                               <label className="block text-gray-700">Username</label>
                               <input
                                 type="text"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
+                                name="username"
+                                value={registerFormik.values.username}
+                                onChange={registerFormik.handleChange}
+                                onBlur={registerFormik.handleBlur}
                                 className="w-full p-2 border rounded"
-                                required
                               />
+                              {registerFormik.touched.password && registerFormik.errors.password && (
+                              <p className="text-red-500 text-sm">{registerFormik.errors.password}</p>
+                            )}
                             </div>
                             <div className="mb-4">
                               <label className="block text-gray-700">Email</label>
                               <input
                                 type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                name="email"
+                                value={registerFormik.values.email}
+                                onChange={registerFormik.handleChange}
+                                onBlur={registerFormik.handleBlur}
                                 className="w-full p-2 border rounded"
-                                required
                               />
+                              {registerFormik.touched.password && registerFormik.errors.password && (
+                              <p className="text-red-500 text-sm">{registerFormik.errors.password}</p>
+                            )}
                             </div>
                             <div className="mb-4">
                               <label className="block text-gray-700">Password</label>
                               <input
                                 type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                name="password"
+                                value={registerFormik.values.password}
+                                onChange={registerFormik.handleChange}
+                                onBlur={registerFormik.handleBlur}
                                 className="w-full p-2 border rounded"
-                                required
                               />
+                              {registerFormik.touched.password && registerFormik.errors.password && (
+                              <p className="text-red-500 text-sm">{registerFormik.errors.password}</p>
+                            )}
                             </div>
                             <button
                               type="submit"

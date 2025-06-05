@@ -2,11 +2,12 @@ import React from 'react';
 import playstore from '../assets/playstore.webp';
 import appstore from '../assets/appstore.webp';
 
-function Footer() {
-  return (
-    <div className="bg-[#eff1f3] mt-20">
-        <div className="py-8 px-8 max-w-6xl mx-auto">
 
+function Footer() {
+  
+  return (
+    <div className="bg-[hsl(210,14%,95%)] mt-20">
+        <div className="py-8 px-8 max-w-6xl mx-auto">
           <div className="flex justify-center gap-5 mb-6">
             <img className="w-32 cursor-pointer" src={playstore} alt="playstore" />
             <img className="w-32 cursor-pointer" src={appstore} alt="appstore" />

@@ -17,7 +17,8 @@ function AdDetails() {
     const fetchListing = async () => {
       try {
         const listingDoc = await getDoc(doc(db, 'listings', id));
-        console.log("details:", listingDoc.data())
+        console.log("details:", listingDoc.data());
+        console.log("firebase db:", db);
         if (listingDoc.exists()) {
           setListing({ id: listingDoc.id, ...listingDoc.data() });
         } else {
@@ -114,7 +115,7 @@ function AdDetails() {
             <p className="text-sm text-gray-500">
               Posted {listing.createdAt?.toDate ? formatDistanceToNow(listing.createdAt.toDate(), { addSuffix: true }) : 'Unknown'}
             </p>
-            <div className="border-t border-b py-4 space-y-2 bg-gray-50 p-4 rounded-lg">
+            <div className="  py-4 space-y-2  p-4 rounded-lg">
               <p><span className="font-semibold">Category:</span> {listing.category || 'Uncategorized'}</p>
               <p><span className="font-semibold">Brand:</span> {listing.brand || 'N/A'}</p>
               <p><span className="font-semibold">Condition:</span> {listing.condition || 'N/A'}</p>
